@@ -1,6 +1,8 @@
 package provider
 
 import (
+	"fmt"
+
 	"github.com/elastic-infra/terraform-provider-ldap/internal/helper/client"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
@@ -29,7 +31,7 @@ func Provider() *schema.Provider {
 			},
 			"bind_password": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("LDAP_BIND_PASSWORD", nil),
 				Description: "Password to authenticate the Bind user.",
 			},
@@ -51,6 +53,18 @@ func Provider() *schema.Provider {
 				DefaultFunc: schema.EnvDefaultFunc("LDAP_TLS_INSECURE", false),
 				Description: "Don't verify server TLS certificate (default: false).",
 			},
+			"use_gssapi": {
+				Type:        schema.TypeBool,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("LDAP_USE_GSSAPI", false),
+				Description: "Use GSSAPI authentication instead of simple (default: false).",
+			},
+			"ccache": {
+				Type:        schema.TypeString,
+				Optional:    true,
+				DefaultFunc: schema.EnvDefaultFunc("KRB5CCNAME", nil),
+				Description: "Kerberos CCache override location",
+			},
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
@@ -67,9 +81,15 @@ func configureProvider(d *schema.ResourceData) (interface{}, error) {
 		LDAPPort:     d.Get("ldap_port").(int),
 		BindUser:     d.Get("bind_user").(string),
 		BindPassword: d.Get("bind_password").(string),
+		CCache:       d.Get("ccache").(string),
 		StartTLS:     d.Get("start_tls").(bool),
 		TLS:          d.Get("tls").(bool),
 		TLSInsecure:  d.Get("tls_insecure").(bool),
+		UseGSSAPI:    d.Get("use_gssapi").(bool),
+	}
+
+	if config.UseGSSAPI && (config.CCache == "") {
+		return nil, fmt.Errorf("When using GSSAPI setting `ccache` or $KRB5CCNAME is required.")
 	}
 
 	connection, err := client.DialAndBind(config)

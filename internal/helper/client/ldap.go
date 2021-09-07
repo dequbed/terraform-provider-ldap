@@ -3,6 +3,7 @@ package client
 import (
 	"crypto/tls"
 	"fmt"
+	"strings"
 
 	"github.com/go-ldap/ldap/v3"
 )
@@ -13,11 +14,17 @@ func DialAndBind(c *Config) (*ldap.Conn, error) {
 		return nil, err
 	}
 
-	// bind to current connection
-	err = conn.Bind(c.BindUser, c.BindPassword)
-	if err != nil {
-		conn.Close()
-		return nil, err
+	if c.UseGSSAPI {
+		ccache := strings.TrimLeft("FILE:", c.CCache)
+		spn := fmt.Sprintf("ldap/%s", c.LDAPHost)
+		err = conn.GSSAPICCBind("/etc/krb5.conf", ccache, spn)
+	} else {
+		// bind to current connection
+		err = conn.Bind(c.BindUser, c.BindPassword)
+		if err != nil {
+			conn.Close()
+			return nil, err
+		}
 	}
 
 	// return the LDAP connection
