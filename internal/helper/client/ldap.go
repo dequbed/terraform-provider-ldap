@@ -15,16 +15,15 @@ func DialAndBind(c *Config) (*ldap.Conn, error) {
 	}
 
 	if c.UseGSSAPI {
-		ccache := strings.TrimLeft("FILE:", c.CCache)
+		ccache := strings.TrimLeft(c.CCache, "FILE:")
 		spn := fmt.Sprintf("ldap/%s", c.LDAPHost)
 		err = conn.GSSAPICCBind("/etc/krb5.conf", ccache, spn)
 	} else {
-		// bind to current connection
 		err = conn.Bind(c.BindUser, c.BindPassword)
-		if err != nil {
-			conn.Close()
-			return nil, err
-		}
+	}
+	if err != nil {
+		conn.Close()
+		return nil, err
 	}
 
 	// return the LDAP connection
