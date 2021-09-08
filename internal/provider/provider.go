@@ -3,7 +3,7 @@ package provider
 import (
 	"fmt"
 
-	"github.com/elastic-infra/terraform-provider-ldap/internal/helper/client"
+	"github.com/dequbed/terraform-provider-ldap/v2/internal/helper/client"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 

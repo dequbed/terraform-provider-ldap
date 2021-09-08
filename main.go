@@ -5,7 +5,7 @@ import (
 	"flag"
 	"log"
 
-	"github.com/elastic-infra/terraform-provider-ldap/internal/provider"
+	"github.com/dequbed/terraform-provider-ldap/v2/internal/provider"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
 )
 

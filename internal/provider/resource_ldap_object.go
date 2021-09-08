@@ -7,8 +7,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/elastic-infra/terraform-provider-ldap/internal/helper/hashcode"
-	"github.com/elastic-infra/terraform-provider-ldap/internal/helper/set"
+	"github.com/dequbed/terraform-provider-ldap/v2/internal/helper/hashcode"
+	"github.com/dequbed/terraform-provider-ldap/v2/internal/helper/set"
 	"github.com/go-ldap/ldap/v3"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
